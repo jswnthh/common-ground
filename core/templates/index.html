@@ -1,0 +1,301 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Common Ground — A shared counselling practice</title>
+    <meta
+      name="description"
+      content="Common Ground is a shared practice of qualified counsellors offering individual, couples and family therapy, in person and online."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Karla:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+  </head>
+
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top">Common<em>Ground</em></a>
+      <nav class="site-nav" aria-label="Primary">
+        <ul>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#approach">Approach</a></li>
+          <li><a href="#stats">The practice</a></li>
+          <li><a href="#book" class="btn btn-dark">Book a session</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="top">
+      <!-- Hero -->
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-orb" aria-hidden="true">
+          <div class="orb"></div>
+        </div>
+        <div class="wrap">
+          <p class="eyebrow">A shared counselling practice</p>
+
+          <!-- Counsellor portraits: a team, not one voice -->
+          <div
+            class="hero-faces"
+            role="img"
+            aria-label="Portraits of the counsellors in our practice, drifting past one another"
+          >
+            <div class="faces-track" id="facesTrack">
+              <img class="face-photo" src="{% static 'images/face_1.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_2.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_3.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_4.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_5.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_6.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_7.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_1.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_2.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_3.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_4.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_5.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_6.png' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_7.png' %}" alt="" aria-hidden="true" />
+            </div>
+          </div>
+
+          <h1 id="hero-heading">
+            A team of counsellors making space for
+            <span class="accent">every kind of mind.</span>
+          </h1>
+          <p class="lede">
+            Individual, couples and family therapy from qualified counsellors
+            with different specialisms — in person and online. One practice, one
+            promise: a safe place to be heard.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-dark" href="#book">Book a first session</a>
+            <a class="btn btn-outline" href="#services">Explore our services</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Specialisms ticker -->
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker-track">
+          <span>Anxiety</span><span>Grief &amp; loss</span
+          ><span>Couples therapy</span><span>Burnout</span
+          ><span>Family therapy</span><span>Trauma</span><span>Self-esteem</span
+          ><span>Life transitions</span> <span>Anxiety</span
+          ><span>Grief &amp; loss</span><span>Couples therapy</span
+          ><span>Burnout</span><span>Family therapy</span><span>Trauma</span
+          ><span>Self-esteem</span><span>Life transitions</span>
+        </div>
+      </div>
+
+      <!-- Services -->
+      <section id="services" aria-labelledby="services-heading">
+        <div class="wrap">
+          <header class="section-head reveal">
+            <p class="eyebrow">What we offer</p>
+            <h2 id="services-heading">
+              Different doors into the same safe room.
+            </h2>
+          </header>
+
+          <div class="services-grid">
+            <article class="service-card reveal">
+              <p class="eyebrow">One-to-one</p>
+              <h3>Individual therapy</h3>
+              <p>
+                Weekly sessions for anxiety, low mood, burnout and everything
+                harder to name — matched to the counsellor whose experience fits
+                you best.
+              </p>
+              <div class="visual" aria-hidden="true"></div>
+            </article>
+
+            <article class="service-card reveal">
+              <p class="eyebrow">Together</p>
+              <h3>Couples &amp; family</h3>
+              <p>
+                Structured, judgment-free sessions to rebuild communication and
+                trust, grounded in systemic and emotionally focused therapy.
+              </p>
+              <div class="visual" aria-hidden="true"></div>
+            </article>
+
+            <article class="service-card reveal">
+              <p class="eyebrow">For organisations</p>
+              <h3>Corporate wellness</h3>
+              <p>
+                On-site and virtual workshops helping teams manage stress and
+                burnout, with confidential one-to-one support for employees who
+                need it.
+              </p>
+              <div class="visual" aria-hidden="true"></div>
+            </article>
+
+            <article class="service-card reveal">
+              <p class="eyebrow">For students</p>
+              <h3>Academic workshops</h3>
+              <p>
+                Practical sessions for schools and universities on exam
+                pressure, emotional resilience and asking for help, led by
+                qualified counsellors.
+              </p>
+              <div class="visual" aria-hidden="true"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Approach -->
+      <section
+        id="approach"
+        class="approach"
+        aria-labelledby="approach-heading"
+      >
+        <div class="wrap">
+          <header class="section-head reveal">
+            <p class="eyebrow">How it works</p>
+            <h2 id="approach-heading">
+              Starting therapy, without the intimidation.
+            </h2>
+          </header>
+
+          <div class="approach-rows">
+            <div class="approach-row reveal">
+              <span class="num">01</span>
+              <h3>Tell us a little</h3>
+              <p>
+                Share what you're going through in a short, confidential enquiry
+                — as much or as little as you're comfortable with.
+              </p>
+            </div>
+            <div class="approach-row reveal">
+              <span class="num">02</span>
+              <h3>We match you</h3>
+              <p>
+                We suggest the counsellor whose specialism best fits your
+                situation. You're never assigned at random.
+              </p>
+            </div>
+            <div class="approach-row reveal">
+              <span class="num">03</span>
+              <h3>Meet at your pace</h3>
+              <p>
+                Your first session is a gentle introduction — no pressure, no
+                long-term commitment. If it doesn't feel right, we'll help you
+                find someone who does.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section id="stats" aria-labelledby="stats-heading">
+        <div class="wrap">
+          <header class="section-head reveal">
+            <p class="eyebrow">The practice</p>
+            <h2 id="stats-heading">Built on real clinical experience.</h2>
+          </header>
+
+          <div class="stats-grid">
+            <div class="stat reveal">
+              <p class="value">
+                <span class="count" data-target="28">0</span
+                ><span class="suffix">+</span>
+              </p>
+              <p class="label">years of combined practice</p>
+            </div>
+            <div class="stat reveal">
+              <p class="value">
+                <span class="count" data-target="3000">0</span
+                ><span class="suffix">+</span>
+              </p>
+              <p class="label">sessions delivered</p>
+            </div>
+            <div class="stat reveal">
+              <p class="value">
+                <span class="count" data-target="12">0</span
+                ><span class="suffix"></span>
+              </p>
+              <p class="label">areas of specialism</p>
+            </div>
+            <div class="stat reveal">
+              <p class="value">
+                <span class="count" data-target="7">0</span
+                ><span class="suffix"> days</span>
+              </p>
+              <p class="label">a week, in person and online</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA marquee -->
+      <section id="book" class="cta-marquee" aria-labelledby="cta-heading">
+        <h2
+          id="cta-heading"
+          class="line"
+          aria-label="The hardest part is reaching out. Start there."
+        >
+          <div class="track" aria-hidden="true">
+            <span>The hardest part is reaching out. Start there.</span>
+            <span>The hardest part is reaching out. Start there.</span>
+          </div>
+        </h2>
+        <div class="actions">
+          <a class="btn btn-light" href="#">Book a first session</a>
+        </div>
+      </section>
+
+      <!-- Closing statement -->
+      <section class="closing" aria-labelledby="closing-heading">
+        <div class="wrap reveal">
+          <p class="eyebrow">Common Ground</p>
+          <h2 id="closing-heading">
+            Life keeps moving.
+            <span class="muted">Make sure you're not carrying it alone.</span>
+          </h2>
+          <p>
+            Your first enquiry is free and completely confidential. Sessions
+            available weekdays and weekends, in person or online.
+          </p>
+          <a class="btn btn-dark" href="#">Get in touch</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <div>
+          <a class="brand" href="#top">Common<em>Ground</em></a>
+          <p>A shared counselling practice.</p>
+        </div>
+        <nav aria-label="Footer">
+          <ul>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#approach">Approach</a></li>
+            <li><a href="#stats">The practice</a></li>
+            <li><a href="#book">Book a session</a></li>
+          </ul>
+        </nav>
+        <address>
+          hello@commonground.example<br />
+          +91 00000 00000<br />
+          Mon–Sun, 9am – 7pm
+        </address>
+        <small
+          >© 2026 Common Ground Counselling. If you're in immediate crisis,
+          please contact your local emergency services or a crisis
+          helpline.</small
+        >
+      </div>
+    </footer>
+
+    <script src="{% static 'js/index.js' %}"></script>
+  </body>
+</html>
