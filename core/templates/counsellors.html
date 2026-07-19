@@ -81,6 +81,7 @@
                       {{ c.languages|join:", " }}
                     </p>
                   </div>
+                  <a class="detail-cta btn btn-outline" href="{% url 'book' %}?counsellor={{ c.slug }}">Book with {{ c.name }}</a>
                 </div>
               </details>
             </li>
