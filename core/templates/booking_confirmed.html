@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Booking confirmed — Common Ground{% endblock %}
+{% block meta_description %}Your session is booked.{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/booking.css' %}" />{% endblock %}
+
+{% block content %}
+      <section class="service-hero" aria-labelledby="confirmed-heading">
+        <div class="wrap">
+          <p class="eyebrow">Booking confirmed</p>
+          <h1 id="confirmed-heading">You're all set{% if booking.client_name %}, {{ booking.client_name }}{% endif %}.</h1>
+          <p class="lede">
+            We've saved your session. This is a portfolio project, so no
+            confirmation email or payment was actually sent — but here's what
+            would be on it.
+          </p>
+        </div>
+      </section>
+
+      <section class="booking-section" aria-labelledby="confirmed-details-heading">
+        <div class="wrap">
+          <h2 id="confirmed-details-heading" class="sr-only">Booking details</h2>
+          <div class="booking-summary booking-summary-static">
+            <p class="summary-row"><span>Counsellor</span><strong>{{ counsellor.name }}</strong></p>
+            <p class="summary-row"><span>Date &amp; time</span><strong>{{ booking.start_at|date:"l, j F Y · g:i A" }}</strong></p>
+            <p class="summary-row">
+              <span>Mode</span>
+              <strong>{% if booking.mode == "in-person" %}In person{% else %}Online{% endif %}</strong>
+            </p>
+          </div>
+          <p class="see-all-counsellors"><a href="{% url 'index' %}">Back to home →</a></p>
+        </div>
+      </section>
+{% endblock %}

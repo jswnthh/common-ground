@@ -17,9 +17,7 @@ if (!prefersReduced && "IntersectionObserver" in window) {
   );
   document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
 } else {
-  document
-    .querySelectorAll(".reveal")
-    .forEach((el) => el.classList.add("in"));
+  document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
 }
 
 // Hero portrait carousel: photos shrink near the edges, swell at the centre
@@ -41,7 +39,10 @@ if (facesViewport && facesTrack) {
       photos.forEach((photo) => {
         const rect = photo.getBoundingClientRect();
         const photoCenter = rect.left + rect.width / 2;
-        const distance = Math.min(Math.abs(photoCenter - center) / halfWidth, 1);
+        const distance = Math.min(
+          Math.abs(photoCenter - center) / halfWidth,
+          1,
+        );
         const closeness = Math.pow(1 - distance, 1.6);
         const scale = MIN_SCALE + (MAX_SCALE - MIN_SCALE) * closeness;
         photo.style.transform = `scale(${scale.toFixed(3)})`;
@@ -57,38 +58,4 @@ if (facesViewport && facesTrack) {
       photo.style.transform = "scale(1)";
     });
   }
-}
-
-// Stat counters
-const counters = document.querySelectorAll(".count");
-const runCounter = (el) => {
-  const target = +el.dataset.target;
-  const duration = 1400;
-  const start = performance.now();
-  const tick = (now) => {
-    const p = Math.min((now - start) / duration, 1);
-    const eased = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.round(target * eased).toLocaleString();
-    if (p < 1) requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-};
-
-if (!prefersReduced && "IntersectionObserver" in window) {
-  const cio = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          runCounter(e.target);
-          cio.unobserve(e.target);
-        }
-      });
-    },
-    { threshold: 0.6 },
-  );
-  counters.forEach((el) => cio.observe(el));
-} else {
-  counters.forEach(
-    (el) => (el.textContent = (+el.dataset.target).toLocaleString()),
-  );
 }

@@ -1,37 +1,7 @@
+{% extends "base.html" %}
 {% load static %}
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Common Ground — A shared counselling practice</title>
-    <meta
-      name="description"
-      content="Common Ground is a shared practice of qualified counsellors offering individual, couples and family therapy, in person and online."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Karla:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
-  </head>
 
-  <body>
-    <header class="site-header">
-      <a class="brand" href="#top">Common<em>Ground</em></a>
-      <nav class="site-nav" aria-label="Primary">
-        <ul>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#approach">Approach</a></li>
-          <li><a href="#stats">The practice</a></li>
-          <li><a href="#book" class="btn btn-dark">Book a session</a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <main id="top">
+{% block content %}
       <!-- Hero -->
       <section class="hero" aria-labelledby="hero-heading">
         <div class="hero-orb" aria-hidden="true">
@@ -74,7 +44,7 @@
             promise: a safe place to be heard.
           </p>
           <div class="hero-actions">
-            <a class="btn btn-dark" href="#book">Book a first session</a>
+            <a class="btn btn-dark" href="{% url 'book' %}">Book a first session</a>
             <a class="btn btn-outline" href="#services">Explore our services</a>
           </div>
         </div>
@@ -104,7 +74,7 @@
           </header>
 
           <div class="services-grid">
-            <article class="service-card reveal">
+            <a class="service-card reveal" href="{% url 'service_detail' 'individual-therapy' %}">
               <p class="eyebrow">One-to-one</p>
               <h3>Individual therapy</h3>
               <p>
@@ -113,9 +83,9 @@
                 you best.
               </p>
               <div class="visual" aria-hidden="true"></div>
-            </article>
+            </a>
 
-            <article class="service-card reveal">
+            <a class="service-card reveal" href="{% url 'service_detail' 'couples-family' %}">
               <p class="eyebrow">Together</p>
               <h3>Couples &amp; family</h3>
               <p>
@@ -123,9 +93,9 @@
                 trust, grounded in systemic and emotionally focused therapy.
               </p>
               <div class="visual" aria-hidden="true"></div>
-            </article>
+            </a>
 
-            <article class="service-card reveal">
+            <a class="service-card reveal" href="{% url 'service_detail' 'corporate-wellness' %}">
               <p class="eyebrow">For organisations</p>
               <h3>Corporate wellness</h3>
               <p>
@@ -134,9 +104,9 @@
                 need it.
               </p>
               <div class="visual" aria-hidden="true"></div>
-            </article>
+            </a>
 
-            <article class="service-card reveal">
+            <a class="service-card reveal" href="{% url 'service_detail' 'academic-workshops' %}">
               <p class="eyebrow">For students</p>
               <h3>Academic workshops</h3>
               <p>
@@ -145,7 +115,7 @@
                 qualified counsellors.
               </p>
               <div class="visual" aria-hidden="true"></div>
-            </article>
+            </a>
           </div>
         </div>
       </section>
@@ -167,18 +137,19 @@
           <div class="approach-rows">
             <div class="approach-row reveal">
               <span class="num">01</span>
-              <h3>Tell us a little</h3>
+              <h3>Pick a service</h3>
               <p>
-                Share what you're going through in a short, confidential enquiry
-                — as much or as little as you're comfortable with.
+                Choose the kind of support you're looking for — individual,
+                couples &amp; family, corporate wellness or academic workshops.
               </p>
             </div>
             <div class="approach-row reveal">
               <span class="num">02</span>
-              <h3>We match you</h3>
+              <h3>Select your focus areas</h3>
               <p>
-                We suggest the counsellor whose specialism best fits your
-                situation. You're never assigned at random.
+                On each service page, choose up to five topics closest to what
+                you're dealing with — from burnout to team conflict to exam
+                stress — and see your best-fit counsellors ranked instantly.
               </p>
             </div>
             <div class="approach-row reveal">
@@ -194,44 +165,35 @@
         </div>
       </section>
 
-      <!-- Stats -->
-      <section id="stats" aria-labelledby="stats-heading">
+      <!-- Meet our counsellors -->
+      <section id="counsellors" aria-labelledby="counsellors-heading">
         <div class="wrap">
-          <header class="section-head reveal">
-            <p class="eyebrow">The practice</p>
-            <h2 id="stats-heading">Built on real clinical experience.</h2>
-          </header>
+          <a
+            class="counsellors-teaser reveal"
+            href="{% url 'counsellors' %}"
+            aria-label="Meet our counsellors — view all profiles"
+          >
+            <div class="counsellors-teaser-text">
+              <p class="eyebrow">The practice</p>
+              <h2 id="counsellors-heading">Meet our counsellors.</h2>
+              <p class="counsellors-sub">
+                Seven therapists specialising in anxiety, burnout, relationships
+                and more — each with a different lens on care.
+              </p>
+            </div>
 
-          <div class="stats-grid">
-            <div class="stat reveal">
-              <p class="value">
-                <span class="count" data-target="28">0</span
-                ><span class="suffix">+</span>
-              </p>
-              <p class="label">years of combined practice</p>
+            <div class="counsellors-teaser-visual">
+              <div class="preview-faces" aria-hidden="true">
+                {% for c in counsellor_previews %}
+                <span class="preview-face">
+                  <img src="{{ c.photo }}" alt="" />
+                  <span class="status-dot {% if c.is_active %}is-active{% else %}is-inactive{% endif %}"></span>
+                </span>
+                {% endfor %}
+              </div>
+              <span class="view-badge" aria-hidden="true">View</span>
             </div>
-            <div class="stat reveal">
-              <p class="value">
-                <span class="count" data-target="3000">0</span
-                ><span class="suffix">+</span>
-              </p>
-              <p class="label">sessions delivered</p>
-            </div>
-            <div class="stat reveal">
-              <p class="value">
-                <span class="count" data-target="12">0</span
-                ><span class="suffix"></span>
-              </p>
-              <p class="label">areas of specialism</p>
-            </div>
-            <div class="stat reveal">
-              <p class="value">
-                <span class="count" data-target="7">0</span
-                ><span class="suffix"> days</span>
-              </p>
-              <p class="label">a week, in person and online</p>
-            </div>
-          </div>
+          </a>
         </div>
       </section>
 
@@ -248,7 +210,7 @@
           </div>
         </h2>
         <div class="actions">
-          <a class="btn btn-light" href="#">Book a first session</a>
+          <a class="btn btn-light" href="{% url 'book' %}">Book a first session</a>
         </div>
       </section>
 
@@ -267,35 +229,4 @@
           <a class="btn btn-dark" href="#">Get in touch</a>
         </div>
       </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="wrap">
-        <div>
-          <a class="brand" href="#top">Common<em>Ground</em></a>
-          <p>A shared counselling practice.</p>
-        </div>
-        <nav aria-label="Footer">
-          <ul>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#approach">Approach</a></li>
-            <li><a href="#stats">The practice</a></li>
-            <li><a href="#book">Book a session</a></li>
-          </ul>
-        </nav>
-        <address>
-          hello@commonground.example<br />
-          +91 00000 00000<br />
-          Mon–Sun, 9am – 7pm
-        </address>
-        <small
-          >© 2026 Common Ground Counselling. If you're in immediate crisis,
-          please contact your local emergency services or a crisis
-          helpline.</small
-        >
-      </div>
-    </footer>
-
-    <script src="{% static 'js/index.js' %}"></script>
-  </body>
-</html>
+{% endblock %}

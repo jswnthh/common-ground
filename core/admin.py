@@ -1,3 +1,90 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import (
+    Booking,
+    CalendarAccount,
+    Counsellor,
+    CounsellorSpecialty,
+    CounsellorWorkingHours,
+    ServiceCategory,
+    Topic,
+)
+
+
+@admin.register(ServiceCategory)
+class ServiceCategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug", "order")
+
+
+@admin.register(Topic)
+class TopicAdmin(admin.ModelAdmin):
+    list_display = ("label", "slug", "category", "order")
+    list_filter = ("category",)
+    search_fields = ("label", "slug")
+
+
+class CounsellorWorkingHoursInline(admin.TabularInline):
+    model = CounsellorWorkingHours
+    extra = 1
+
+
+class CounsellorSpecialtyInline(admin.TabularInline):
+    model = CounsellorSpecialty
+    extra = 1
+    autocomplete_fields = ("topic",)
+
+
+@admin.register(Counsellor)
+class CounsellorAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug", "location", "is_active", "user")
+    list_filter = ("is_active",)
+    list_editable = ("is_active",)
+    search_fields = ("name", "slug", "location")
+    inlines = [CounsellorWorkingHoursInline, CounsellorSpecialtyInline]
+
+    def get_readonly_fields(self, request, obj=None):
+        # slug is the lookup key used everywhere (URLs, ?counsellor=<slug>,
+        # Booking.counsellor_slug — a plain string, not a FK) — renaming it
+        # after creation would silently orphan booking history and break
+        # bookmarked links, so it's only editable at creation time.
+        return ("slug",) if obj else ()
+
+    # --- Per-counsellor self-edit restriction (groundwork for a future
+    # counsellor login: a non-superuser tied to a Counsellor via `user` can
+    # only ever see/edit their own row here; no inline-level overrides are
+    # needed since the inlines are only ever reached through this
+    # already-restricted parent object). ---
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(user=request.user)
+
+    def has_change_permission(self, request, obj=None):
+        if not super().has_change_permission(request, obj):
+            return False
+        return request.user.is_superuser or obj is None or obj.user_id == request.user.id
+
+    def has_view_permission(self, request, obj=None):
+        return self.has_change_permission(request, obj)
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ("start_at", "counsellor_slug", "client_name", "mode", "status")
+    list_filter = ("status", "mode", "counsellor_slug")
+    search_fields = ("client_name", "client_email", "counsellor_slug")
+    date_hierarchy = "start_at"
+    readonly_fields = ("created_at",)
+
+
+@admin.register(CalendarAccount)
+class CalendarAccountAdmin(admin.ModelAdmin):
+    list_display = ("counsellor_slug", "provider", "is_connected", "connected_at")

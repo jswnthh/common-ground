@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ service.name }} — Common Ground{% endblock %}
+{% block meta_description %}{{ service.intro }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/service.css' %}" />{% endblock %}
+
+{% block content %}
+      <section class="service-hero" aria-labelledby="service-heading">
+        <div class="wrap">
+          <p class="eyebrow">{{ service.eyebrow }}</p>
+          <h1 id="service-heading">{{ service.name }}</h1>
+          <p class="lede">{{ service.intro }}</p>
+        </div>
+      </section>
+
+      <section class="focus-picker" aria-labelledby="focus-heading">
+        <div class="wrap">
+          <header class="section-head">
+            <p class="eyebrow">Find your best fit</p>
+            <h2 id="focus-heading">What would you like to work on?</h2>
+            <p class="focus-hint">
+              Select up to five topics that feel closest to what's bringing
+              you here — we'll suggest the counsellors best placed to help.
+            </p>
+          </header>
+
+          <div class="topic-grid" id="topicGrid" role="group" aria-label="Focus areas">
+            {% for topic in topics %}
+            <button type="button" class="topic-chip" data-topic="{{ topic.slug }}">{{ topic.label }}</button>
+            {% endfor %}
+          </div>
+
+          <div class="mode-filter" role="group" aria-label="Preferred mode">
+            <span class="filter-label">Preferred mode</span>
+            <button type="button" class="mode-chip is-active" data-mode="any">Either</button>
+            <button type="button" class="mode-chip" data-mode="online">Online</button>
+            <button type="button" class="mode-chip" data-mode="in-person">In person</button>
+          </div>
+
+          <div class="matches" aria-live="polite">
+            <p class="matches-empty" id="matchesEmpty">
+              Select a focus area above to see your best-fit counsellors.
+            </p>
+            <div class="matches-grid" id="matchesGrid" hidden></div>
+          </div>
+
+          <p class="see-all-counsellors">
+            <a href="{% url 'counsellors' %}">See all counsellors →</a>
+          </p>
+        </div>
+      </section>
+{% endblock %}
+
+{% block extra_js %}
+{{ counsellors|json_script:"counsellors-data" }}
+<script src="{% static 'js/service.js' %}"></script>
+{% endblock %}

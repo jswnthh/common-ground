@@ -1,0 +1,70 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Common Ground — A shared counselling practice{% endblock %}</title>
+    <meta
+      name="description"
+      content="{% block meta_description %}Common Ground is a shared practice of qualified counsellors offering individual, couples and family therapy, in person and online.{% endblock %}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Karla:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+    {% block extra_css %}{% endblock %}
+  </head>
+
+  <body>
+    <div class="crisis-bar">
+      <span class="crisis-bar-full">In immediate crisis, call <a href="tel:104">104</a> (State Health Helpline) or <a href="tel:14416">14416</a> (Tele-MANAS Mental Health Helpline)</span>
+      <span class="crisis-bar-short">Crisis? Call <a href="tel:104">104</a> or <a href="tel:14416">14416</a></span>
+    </div>
+
+    <header class="site-header">
+      <a class="brand" href="{% url 'index' %}#top">Common<em>Ground</em></a>
+      <nav class="site-nav" aria-label="Primary">
+        <ul>
+          <li><a href="{% url 'index' %}#services">Services</a></li>
+          <li><a href="{% url 'index' %}#approach">Approach</a></li>
+          <li><a href="{% url 'index' %}#counsellors">Our counsellors</a></li>
+          <li><a href="{% url 'book' %}" class="btn btn-dark">Book a session</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="top">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <div>
+          <a class="brand" href="{% url 'index' %}#top">Common<em>Ground</em></a>
+          <p>A shared counselling practice.</p>
+        </div>
+        <nav aria-label="Footer">
+          <ul>
+            <li><a href="{% url 'index' %}#services">Services</a></li>
+            <li><a href="{% url 'index' %}#approach">Approach</a></li>
+            <li><a href="{% url 'index' %}#counsellors">Our counsellors</a></li>
+            <li><a href="{% url 'book' %}">Book a session</a></li>
+          </ul>
+        </nav>
+        <address>
+          auxiliyathara2@gmail.com<br />
+          +91 79042 21476<br />
+          Mon–Sun, 9am – 7pm
+        </address>
+        <small>© 2026 Common Ground Counselling.</small>
+      </div>
+    </footer>
+
+    <script src="{% static 'js/index.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

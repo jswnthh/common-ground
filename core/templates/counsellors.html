@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Meet our counsellors — Common Ground{% endblock %}
+{% block meta_description %}Meet the therapists behind Common Ground — their specialisms, approaches and how to book a first session.{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/counsellors.css' %}" />{% endblock %}
+
+{% block content %}
+      <section class="counsellors-hero" aria-labelledby="counsellors-page-heading">
+        <div class="wrap">
+          <p class="eyebrow">The practice</p>
+          <h1 id="counsellors-page-heading">Meet our counsellors.</h1>
+          <p class="lede">
+            Seven therapists, seven different lenses on care. Tap a row to
+            read more, or head to a
+            <a href="{% url 'index' %}#services">service</a> to get matched
+            by focus area instead.
+          </p>
+        </div>
+      </section>
+
+      <section class="counsellors-list-section" aria-labelledby="list-heading">
+        <div class="wrap">
+          <h2 id="list-heading" class="sr-only">All counsellors</h2>
+          <ul class="counsellors-list">
+            {% for c in counsellors %}
+            <li class="counsellor-row" id="{{ c.slug }}">
+              <details class="counsellor-accordion">
+                <summary class="counsellor-summary">
+                  <!-- <img class="counsellor-photo" src="{{ c.photo }}" alt="" aria-hidden="true" /> -->
+                  <div class="summary-text">
+                    <h3>{{ c.name }}</h3>
+                    <p class="designation">{{ c.credentials }}</p>
+                    <p class="status-line">
+                      <span class="status-dot {% if c.is_active %}is-active{% else %}is-inactive{% endif %}"></span>
+                      {% if c.is_active %}Accepting new clients{% else %}Not currently available{% endif %}
+                    </p>
+                    <p class="intro">{{ c.intro }}</p>
+                  </div>
+                  <a class="row-cta btn btn-outline" href="{% url 'book' %}?counsellor={{ c.slug }}">Book with {{ c.name }}</a>
+                  <span class="chevron" aria-hidden="true"></span>
+                </summary>
+
+                <div class="counsellor-detail">
+                  <img class="detail-photo" src="{{ c.photo }}" alt="" aria-hidden="true" />
+                  <div class="detail-body">
+                    <p class="bio">{{ c.bio }}</p>
+                    <div class="detail-grid">
+                      <div>
+                        <p class="detail-label">Specialises in</p>
+                        <ul class="tag-list">
+                          {% for label in c.specialty_labels|slice:":6" %}
+                          <li>{{ label }}</li>
+                          {% endfor %}
+                        </ul>
+                        {% if c.specialty_labels|length > 6 %}
+                        <details class="tag-list-more">
+                          <summary>+{{ c.specialty_labels|length|add:"-6" }} more</summary>
+                          <ul class="tag-list">
+                            {% for label in c.specialty_labels|slice:"6:" %}
+                            <li>{{ label }}</li>
+                            {% endfor %}
+                          </ul>
+                        </details>
+                        {% endif %}
+                      </div>
+                      <div>
+                        <p class="detail-label">Modalities</p>
+                        <ul class="tag-list">
+                          {% for modality in c.modalities %}
+                          <li>{{ modality }}</li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    </div>
+                    <p class="meta">
+                      {{ c.location }}
+                      ·
+                      {% for mode in c.modes %}{% if mode == "in-person" %}In person{% else %}Online{% endif %}{% if not forloop.last %} &amp; {% endif %}{% endfor %}
+                      ·
+                      {{ c.languages|join:", " }}
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+{% endblock %}
