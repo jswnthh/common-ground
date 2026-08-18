@@ -19,14 +19,14 @@ class BookingForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["counsellor_slug"].choices = [
-            (c["slug"], c["name"]) for c in get_counsellors()
+            (c["slug"], c["name"]) for c in get_counsellors(bookable_only=True)
         ]
 
     def clean(self):
         cleaned = super().clean()
-        counsellor = get_counsellor_by_slug(cleaned.get("counsellor_slug"))
+        counsellor = get_counsellor_by_slug(cleaned.get("counsellor_slug"), bookable_only=True)
         if counsellor is None:
-            raise forms.ValidationError("Unknown counsellor.")
+            raise forms.ValidationError("Unknown counsellor or counsellor is not currently accepting bookings.")
 
         mode = cleaned.get("mode")
         if mode and mode not in counsellor["modes"]:

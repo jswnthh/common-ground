@@ -69,14 +69,17 @@ def _to_dict(counsellor):
     }
 
 
-def _counsellor_queryset():
-    return Counsellor.objects.prefetch_related("hour_blocks", "specialty_links__topic")
+def _counsellor_queryset(*, bookable_only=False):
+    qs = Counsellor.objects.prefetch_related("hour_blocks", "specialty_links__topic")
+    if bookable_only:
+        qs = qs.filter(is_active=True)
+    return qs
 
 
-def get_counsellors():
-    return [_to_dict(c) for c in _counsellor_queryset()]
+def get_counsellors(*, bookable_only=False):
+    return [_to_dict(c) for c in _counsellor_queryset(bookable_only=bookable_only)]
 
 
-def get_counsellor_by_slug(slug):
-    counsellor = _counsellor_queryset().filter(slug=slug).first()
+def get_counsellor_by_slug(slug, *, bookable_only=False):
+    counsellor = _counsellor_queryset(bookable_only=bookable_only).filter(slug=slug).first()
     return _to_dict(counsellor) if counsellor else None

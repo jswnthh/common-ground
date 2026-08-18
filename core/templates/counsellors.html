@@ -37,7 +37,11 @@
                     </p>
                     <p class="intro">{{ c.intro }}</p>
                   </div>
+                  {% if c.is_active %}
                   <a class="row-cta btn btn-outline" href="{% url 'book' %}?counsellor={{ c.slug }}">Book with {{ c.name }}</a>
+                  {% else %}
+                  <span class="row-cta btn btn-outline is-disabled" aria-disabled="true">Not accepting bookings</span>
+                  {% endif %}
                   <span class="chevron" aria-hidden="true"></span>
                 </summary>
 
@@ -81,7 +85,9 @@
                       {{ c.languages|join:", " }}
                     </p>
                   </div>
+                  {% if c.is_active %}
                   <a class="detail-cta btn btn-outline" href="{% url 'book' %}?counsellor={{ c.slug }}">Book with {{ c.name }}</a>
+                  {% endif %}
                 </div>
               </details>
             </li>

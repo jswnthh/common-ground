@@ -84,6 +84,34 @@ class BookingViewTests(TestCase):
         self.assertEqual(second.status_code, 200)  # re-rendered form, not a 500
         self.assertEqual(Booking.objects.count(), 1)
 
+    def test_inactive_counsellor_cannot_be_booked(self):
+        Counsellor.objects.filter(slug=self.counsellor["slug"]).update(is_active=False)
+        response = self.client.post(reverse("book"), self._post_data())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Booking.objects.count(), 0)
+        self.assertContains(response, "not currently accepting bookings", status_code=200)
+
+    def test_inactive_counsellor_query_param_is_ignored(self):
+        Counsellor.objects.filter(slug=self.counsellor["slug"]).update(is_active=False)
+        response = self.client.get(reverse("book") + f"?counsellor={self.counsellor['slug']}")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, f'data-slug="{self.counsellor["slug"]}"')
+
+
+class BookConfirmedTests(TestCase):
+    def test_missing_counsellor_shows_fallback_name(self):
+        booking = Booking.objects.create(
+            counsellor_slug="former-counsellor",
+            client_name="Alex",
+            client_email="alex@example.com",
+            mode="online",
+            start_at=timezone.now() + timedelta(days=3),
+            end_at=timezone.now() + timedelta(days=3, minutes=50),
+        )
+        response = self.client.get(reverse("book_confirmed", args=[booking.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Former Counsellor")
+
 
 class CounsellorAdminPermissionTests(TestCase):
     """A non-superuser staff account tied to a Counsellor via `.user` should

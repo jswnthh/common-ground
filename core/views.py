@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from django.db import IntegrityError, transaction
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods
 
 from .calendar_sync import create_calendar_event
@@ -20,7 +21,10 @@ def _resolved_counsellor(counsellor, topic_labels):
     )
     return {
         **counsellor,
-        "specialty_labels": [topic_labels[topic_slug] for topic_slug in specialty_labels],
+        "specialty_labels": [
+            topic_labels.get(topic_slug, topic_slug.replace("-", " ").title())
+            for topic_slug in specialty_labels
+        ],
     }
 
 
@@ -48,7 +52,7 @@ def service_detail(request, slug):
     context = {
         "service": service,
         "topics": topics,
-        "counsellors": get_counsellors(),
+        "counsellors": get_counsellors(bookable_only=True),
     }
     return render(request, "service_detail.html", context)
 
@@ -64,6 +68,8 @@ def counsellors(request):
 @require_http_methods(["GET", "POST"])
 def book(request):
     preselected_slug = request.GET.get("counsellor", "")
+    if preselected_slug and get_counsellor_by_slug(preselected_slug, bookable_only=True) is None:
+        preselected_slug = ""
 
     if request.method == "POST":
         form = BookingForm(request.POST)
@@ -99,10 +105,11 @@ def book(request):
                 "modes": c["modes"],
                 "working_hours": c["working_hours"],
             }
-            for c in get_counsellors()
+            for c in get_counsellors(bookable_only=True)
         ],
         "preselected_slug": preselected_slug,
         "booking_window_days": BOOKING_WINDOW_DAYS,
+        "booking_horizon": (timezone.now() + timedelta(days=BOOKING_WINDOW_DAYS)).isoformat(),
         "session_fee_display": SESSION_FEE_DISPLAY,
     }
     return render(request, "booking.html", context)
@@ -110,7 +117,7 @@ def book(request):
 
 @require_GET
 def booking_availability(request):
-    counsellor = get_counsellor_by_slug(request.GET.get("counsellor", ""))
+    counsellor = get_counsellor_by_slug(request.GET.get("counsellor", ""), bookable_only=True)
     if counsellor is None:
         return JsonResponse({"error": "unknown counsellor"}, status=404)
     try:
@@ -130,8 +137,9 @@ def booking_availability(request):
 @require_GET
 def book_confirmed(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
+    counsellor = get_counsellor_by_slug(booking.counsellor_slug)
     context = {
         "booking": booking,
-        "counsellor": get_counsellor_by_slug(booking.counsellor_slug),
+        "counsellor_name": counsellor["name"] if counsellor else booking.counsellor_slug.replace("-", " ").title(),
     }
     return render(request, "booking_confirmed.html", context)
