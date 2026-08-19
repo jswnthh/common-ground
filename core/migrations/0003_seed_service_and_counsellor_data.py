@@ -154,7 +154,7 @@ COUNSELLORS = [
     {
         "slug": "divya-shri",
         "name": "Ms. Divya Shri S",
-        "credentials": "Counselling Psychologist, MSc",
+        "credentials": "Counselling Psychologist",
         "photo_placeholder": "images/face_2.png",
         "modes": ["online", "in-person"],
         "languages": ["Tamil", "English"],
@@ -384,7 +384,7 @@ COUNSELLORS = [
     {
         "slug": "yasotha-natarajan",
         "name": "Ms. Yasotha Natarajan",
-        "credentials": "Counselling Psychologist, MSc | School Counsellor",
+        "credentials": "Counselling Psychologist | School Counsellor",
         "photo_placeholder": "images/face_7.png",
         "modes": ["online", "in-person"],
         "languages": ["Tamil", "English"],
