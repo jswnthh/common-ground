@@ -30,8 +30,11 @@ if not SECRET_KEY:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://shared-counselling.onrender.com', '127.0.0.1', 'localhost']
 
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS",
+    "localhost"
+).split(",")
 
 # Application definition
 
