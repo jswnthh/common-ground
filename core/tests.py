@@ -1,12 +1,16 @@
 from datetime import timedelta
+from io import BytesIO
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from PIL import Image
 
 from .data import get_counsellor_by_slug, get_counsellors
+from .images import card_name, thumb_name
 from .models import Booking, Counsellor
 from .scheduling import MIN_LEAD_TIME, get_available_slots
 
@@ -157,7 +161,7 @@ class CounsellorAdminPermissionTests(TestCase):
             "slug": self.mine.slug,
             "credentials": self.mine.credentials,
             "location": self.mine.location,
-            "photo_placeholder": "images/face_1.png",
+            "photo_placeholder": "images/face_1.avif",
             "languages": "[]",
             "modes": "[]",
             "intro": "Test intro.",
@@ -184,3 +188,49 @@ class CounsellorAdminPermissionTests(TestCase):
 
         delete_response = self.client.get(reverse("admin:core_counsellor_delete", args=[self.mine.pk]))
         self.assertEqual(delete_response.status_code, 403)
+
+
+def _jpeg_upload(size=(1200, 900)):
+    buf = BytesIO()
+    Image.new("RGB", size, (80, 120, 90)).save(buf, format="JPEG")
+    return SimpleUploadedFile("portrait.jpg", buf.getvalue(), content_type="image/jpeg")
+
+
+class CounsellorPhotoTests(TestCase):
+    def setUp(self):
+        import shutil
+        import tempfile
+
+        self._media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self._media)
+        media = override_settings(MEDIA_ROOT=self._media)
+        media.enable()
+        self.addCleanup(media.disable)
+
+    def test_placeholder_urls_are_avif_and_paired(self):
+        row = Counsellor.objects.get(slug=get_counsellors()[0]["slug"])
+        row.photo = None
+        row.photo_placeholder = "images/face_1.png"
+        row.save()
+        data = get_counsellor_by_slug(row.slug)
+        self.assertTrue(data["photo"].endswith("face_1.avif"))
+        self.assertEqual(data["photo"], data["photo_thumb"])
+
+    def test_upload_writes_webp_variants(self):
+        counsellor = Counsellor.objects.create(
+            slug="photo-test",
+            name="Photo Test",
+            credentials="Test",
+            location="Testville",
+            intro="Intro",
+            bio="Bio",
+            photo=_jpeg_upload(),
+        )
+        name = counsellor.photo.name
+        storage = counsellor.photo.storage
+        self.assertTrue(storage.exists(thumb_name(name)))
+        self.assertTrue(storage.exists(card_name(name)))
+        data = get_counsellor_by_slug("photo-test")
+        self.assertIn("/cards/", data["photo"])
+        self.assertIn("/thumbs/", data["photo_thumb"])
+

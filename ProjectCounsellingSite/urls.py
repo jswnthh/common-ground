@@ -24,5 +24,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
-if settings.DEBUG:
+if settings.DEBUG and settings.STORAGES["default"]["BACKEND"].endswith("FileSystemStorage"):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-tqpbmxo$u^bo@qv6^3)pbx#y*cyxoa67jpx_7b0w1_j)@-ol7j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() not in ("0", "false", "no")
 
 ALLOWED_HOSTS = []
 
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,7 +121,53 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Hashed, immutable static files in production (collectstatic). Local runserver
+# keeps the plain storage backend so CSS/JS edits show up without a collect.
+_static_backend = (
+    "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    if not DEBUG
+    else "django.contrib.staticfiles.storage.StaticFilesStorage"
+)
+
 # Counsellor headshot uploads (ImageField on core.Counsellor). Served by
-# Django itself in dev only — see ProjectCounsellingSite/urls.py.
-MEDIA_URL = 'media/'
+# Django itself in dev only — see ProjectCounsellingSite/urls.py. When
+# AWS_STORAGE_BUCKET_NAME is set, uploads go to S3/R2 instead (public-read,
+# long cache; django-storages).
+MEDIA_URL = os.environ.get("MEDIA_URL", "media/")
 MEDIA_ROOT = BASE_DIR / 'media'
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": _static_backend,
+    },
+}
+
+_aws_bucket = os.environ.get("AWS_STORAGE_BUCKET_NAME", "")
+if _aws_bucket:
+    _aws_domain = os.environ.get("AWS_S3_CUSTOM_DOMAIN", "")
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "access_key": os.environ.get("AWS_ACCESS_KEY_ID", ""),
+            "secret_key": os.environ.get("AWS_SECRET_ACCESS_KEY", ""),
+            "bucket_name": _aws_bucket,
+            "region_name": os.environ.get("AWS_S3_REGION_NAME", "auto"),
+            "endpoint_url": os.environ.get("AWS_S3_ENDPOINT_URL") or None,
+            "custom_domain": _aws_domain or None,
+            "default_acl": None,
+            "querystring_auth": False,
+            "file_overwrite": True,
+            "object_parameters": {
+                "CacheControl": "public, max-age=31536000, immutable",
+            },
+        },
+    }
+    if _aws_domain:
+        MEDIA_URL = f"https://{_aws_domain}/"
+    elif os.environ.get("MEDIA_URL"):
+        MEDIA_URL = os.environ["MEDIA_URL"]
+    else:
+        MEDIA_URL = f"https://{_aws_bucket}.s3.amazonaws.com/"

@@ -12,6 +12,7 @@ time) so admin edits show up immediately, without a server restart.
 
 from django.templatetags.static import static
 
+from .images import card_name, thumb_name, write_variants
 from .models import Counsellor, ServiceCategory, Topic
 
 
@@ -33,8 +34,33 @@ def get_services():
     }
 
 
-def _resolve_photo(counsellor):
-    return counsellor.photo.url if counsellor.photo else static(counsellor.photo_placeholder)
+def _placeholder_path(path):
+    """Seeded rows still say .png; files on disk are .avif."""
+    if path.endswith(".png") and path.startswith("images/face_"):
+        return f"{path[:-4]}.avif"
+    return path
+
+
+def _resolve_photos(counsellor):
+    """Return (detail_url, thumb_url). Detail is the 600px card when a
+    real upload exists; both fall back to the static placeholder."""
+    placeholder = static(_placeholder_path(counsellor.photo_placeholder))
+    if not counsellor.photo:
+        return placeholder, placeholder
+
+    storage = counsellor.photo.storage
+    name = counsellor.photo.name
+    thumb_path = thumb_name(name)
+    card_path = card_name(name)
+    if not storage.exists(thumb_path) or not storage.exists(card_path):
+        write_variants(counsellor)
+        name = counsellor.photo.name
+        thumb_path = thumb_name(name)
+        card_path = card_name(name)
+
+    detail = storage.url(card_path) if storage.exists(card_path) else counsellor.photo.url
+    thumb = storage.url(thumb_path) if storage.exists(thumb_path) else counsellor.photo.url
+    return detail, thumb
 
 
 def _working_hours_dict(counsellor):
@@ -51,11 +77,13 @@ def _specialties_dict(counsellor):
 
 
 def _to_dict(counsellor):
+    photo, photo_thumb = _resolve_photos(counsellor)
     return {
         "slug": counsellor.slug,
         "name": counsellor.name,
         "credentials": counsellor.credentials,
-        "photo": _resolve_photo(counsellor),
+        "photo": photo,
+        "photo_thumb": photo_thumb,
         "is_active": counsellor.is_active,
         "modes": counsellor.modes,
         "languages": counsellor.languages,

@@ -17,26 +17,25 @@
             aria-label="Portraits of the counsellors in our practice, drifting past one another"
           >
             <div class="faces-track" id="facesTrack">
-              <img class="face-photo" src="{% static 'images/face_1.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_2.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_3.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_4.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_5.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_6.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_7.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_1.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_2.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_3.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_4.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_5.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_6.avif' %}" alt="" aria-hidden="true" />
-              <img class="face-photo" src="{% static 'images/face_7.avif' %}" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_1.avif' %}" width="160" height="160" decoding="async" fetchpriority="high" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_2.avif' %}" width="160" height="160" decoding="async" fetchpriority="high" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_3.avif' %}" width="160" height="160" decoding="async" fetchpriority="high" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_4.avif' %}" width="160" height="160" decoding="async" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_5.avif' %}" width="160" height="160" decoding="async" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_6.avif' %}" width="160" height="160" decoding="async" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_7.avif' %}" width="160" height="160" decoding="async" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_1.avif' %}" width="160" height="160" decoding="async" loading="lazy" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_2.avif' %}" width="160" height="160" decoding="async" loading="lazy" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_3.avif' %}" width="160" height="160" decoding="async" loading="lazy" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_4.avif' %}" width="160" height="160" decoding="async" loading="lazy" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_5.avif' %}" width="160" height="160" decoding="async" loading="lazy" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_6.avif' %}" width="160" height="160" decoding="async" loading="lazy" alt="" aria-hidden="true" />
+              <img class="face-photo" src="{% static 'images/face_7.avif' %}" width="160" height="160" decoding="async" loading="lazy" alt="" aria-hidden="true" />
             </div>
           </div>
 
           <h1 id="hero-heading">
-            A team of counsellors making space for
-            <span class="accent">every kind of mind.</span>
+            A team of counsellors making space for every kind of mind.
           </h1>
           <p class="lede">
             Individual, couples and family therapy from qualified counsellors
@@ -186,7 +185,7 @@
               <div class="preview-faces" aria-hidden="true">
                 {% for c in counsellor_previews %}
                 <span class="preview-face">
-                  <img src="{{ c.photo }}" alt="" />
+                  <img src="{{ c.photo }}" width="56" height="56" loading="lazy" decoding="async" alt="" />
                   <span class="status-dot {% if c.is_active %}is-active{% else %}is-inactive{% endif %}"></span>
                 </span>
                 {% endfor %}
