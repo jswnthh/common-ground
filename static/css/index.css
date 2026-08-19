@@ -286,7 +286,7 @@ a {
   position: relative;
   overflow: hidden;
   width: min(760px, 88vw);
-  height: clamp(120px, 15vw, 168px);
+  height: clamp(132px, 16vw, 184px);
   margin: 1.8rem auto 0.4rem;
   -webkit-mask-image: linear-gradient(
     to right,
