@@ -31,10 +31,14 @@ if not SECRET_KEY:
 DEBUG = True
 
 
-ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS",
-    "localhost"
-).split(",")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "ALLOWED_HOSTS",
+        "localhost"
+    ).split(",")
+    if host.strip()
+]
 
 # Application definition
 
