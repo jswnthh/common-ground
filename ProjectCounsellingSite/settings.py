@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -28,17 +29,30 @@ if not SECRET_KEY:
     raise ImproperlyConfigured("SECRET_KEY environment variable is not set")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Render sets RENDER=true; default DEBUG off there, on locally. Explicit DEBUG wins.
+_on_render = bool(os.environ.get("RENDER"))
+if "DEBUG" in os.environ:
+    DEBUG = os.environ["DEBUG"].lower() in ("true", "1", "yes")
+else:
+    DEBUG = not _on_render
 
 
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "ALLOWED_HOSTS",
-        "127.0.0.1"
+        "127.0.0.1,localhost",
     ).split(",")
     if host.strip()
 ]
+if _on_render:
+    ALLOWED_HOSTS.append(".onrender.com")
+
+CSRF_TRUSTED_ORIGINS = ["https://*.onrender.com"]
+for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(","):
+    origin = origin.strip()
+    if origin and origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 # Application definition
 
@@ -49,6 +63,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     'core',
 ]
 
@@ -85,13 +100,32 @@ WSGI_APPLICATION = 'ProjectCounsellingSite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# Render Postgres (and any other host) injects DATABASE_URL; local stays SQLite.
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.environ.get("DATABASE_URL"):
+    import dj_database_url
+
+    DATABASES = {
+        "default": dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+# Trust the reverse proxy's HTTPS hint; force secure cookies/HSTS off localhost.
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600
 
 
 # Password validation

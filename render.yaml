@@ -1,0 +1,21 @@
+# Blueprint: Common Ground web service + Render Postgres.
+# Do not put real secrets in this file. SECRET_KEY is prompted in the dashboard.
+
+databases:
+  - name: counselling-site-db
+    plan: free
+
+services:
+  - type: web
+    name: counselling-site
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
+    startCommand: gunicorn ProjectCounsellingSite.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: counselling-site-db
+          property: connectionString
+      - key: SECRET_KEY
+        sync: false

@@ -1,8 +1,9 @@
 from datetime import date, timedelta
 
 from django.db import IntegrityError, transaction
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods
 
@@ -143,3 +144,16 @@ def book_confirmed(request, booking_id):
         "counsellor_name": counsellor["name"] if counsellor else booking.counsellor_slug.replace("-", " ").title(),
     }
     return render(request, "booking_confirmed.html", context)
+
+
+@require_GET
+def robots_txt(request):
+    sitemap_url = request.build_absolute_uri(reverse("sitemap"))
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /admin/\n"
+        "Disallow: /book/availability/\n"
+        f"\nSitemap: {sitemap_url}\n"
+    )
+    return HttpResponse(body, content_type="text/plain")

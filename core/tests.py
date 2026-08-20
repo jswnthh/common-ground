@@ -234,3 +234,31 @@ class CounsellorPhotoTests(TestCase):
         self.assertIn("/cards/", data["photo"])
         self.assertIn("/thumbs/", data["photo_thumb"])
 
+
+class SitemapTests(TestCase):
+    def test_sitemap_lists_public_pages(self):
+        response = self.client.get(reverse("sitemap"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/xml")
+        body = response.content.decode()
+        for path in (
+            "/",
+            "/counsellors/",
+            "/book/",
+            "/services/individual-therapy/",
+            "/services/couples-family/",
+            "/services/corporate-wellness/",
+            "/services/academic-workshops/",
+        ):
+            self.assertIn(path, body)
+        self.assertNotIn("/admin/", body)
+        self.assertNotIn("/book/availability/", body)
+
+    def test_robots_txt_points_at_sitemap(self):
+        response = self.client.get(reverse("robots_txt"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("text/plain", response["Content-Type"])
+        self.assertContains(response, "Disallow: /admin/")
+        self.assertContains(response, "Sitemap:")
+        self.assertContains(response, "/sitemap.xml")
+
