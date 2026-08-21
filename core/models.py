@@ -39,11 +39,15 @@ class Counsellor(models.Model):
     slug = models.SlugField(max_length=64, unique=True)
     name = models.CharField(max_length=120)
     credentials = models.CharField(max_length=160)
-    photo = models.ImageField(upload_to="counsellors/", blank=True)
-    # Fallback illustration shown until a real photo is uploaded. The default
-    # here only ever fires for a hypothetical future row that forgets to set
-    # one — every seeded counsellor gets its own real value.
-    photo_placeholder = models.CharField(max_length=200, default="images/face_1.avif", blank=True)
+    # Path under static/ (no leading slash), e.g.
+    # images/counsellors/cards/thara.webp — thumbs are the same filename
+    # under images/counsellors/thumbs/. Hero-style face_N.avif still works.
+    photo_placeholder = models.CharField(
+        max_length=200,
+        default="images/face_1.avif",
+        blank=True,
+        help_text="Static path, e.g. images/counsellors/cards/thara.webp",
+    )
     location = models.CharField(max_length=120)
     # Whether this counsellor is currently practising/accepting new clients —
     # shown as a green/red status dot on the homepage. Defaults to True so
@@ -75,24 +79,6 @@ class Counsellor(models.Model):
         blank=True,
         related_name="counsellor_profile",
     )
-
-    def save(self, *args, **kwargs):
-        photo_changed = self._photo_changed()
-        super().save(*args, **kwargs)
-        if photo_changed and self.photo:
-            from .images import write_variants
-
-            write_variants(self, cap_original=True)
-
-    def _photo_changed(self):
-        if not self.photo:
-            return False
-        if not self.pk:
-            return True
-        previous = (
-            Counsellor.objects.filter(pk=self.pk).values_list("photo", flat=True).first()
-        )
-        return previous != self.photo.name
 
     def __str__(self):
         return self.name

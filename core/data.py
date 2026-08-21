@@ -13,7 +13,6 @@ time) so admin edits show up immediately, without a server restart.
 from django.conf import settings
 from django.templatetags.static import static
 
-from .images import card_name, thumb_name, write_variants
 from .models import Counsellor, ServiceCategory, Topic
 
 
@@ -42,8 +41,8 @@ def _placeholder_path(path):
     return path
 
 
-def _placeholder_url(path):
-    """Prefer .avif; if hashed storage rejects it, fall back to .png."""
+def _static_url(path):
+    """Resolve a path under static/. Missing hashed names must not 500."""
     converted = _placeholder_path(path or "")
     try:
         return static(converted)
@@ -58,32 +57,18 @@ def _placeholder_url(path):
     return f"{settings.STATIC_URL.rstrip('/')}/{suffix.lstrip('/')}"
 
 
+def _thumb_static_path(card_path):
+    """cards/foo.webp → thumbs/foo.webp; face_N stays itself."""
+    path = _placeholder_path(card_path or "")
+    if "/cards/" in path:
+        return path.replace("/cards/", "/thumbs/", 1)
+    return path
+
+
 def _resolve_photos(counsellor):
-    """Return (detail_url, thumb_url). Detail is the 600px card when a
-    real upload exists; both fall back to the static placeholder."""
-    placeholder = _placeholder_url(counsellor.photo_placeholder)
-    if not counsellor.photo:
-        return placeholder, placeholder
-
-    storage = counsellor.photo.storage
-    name = counsellor.photo.name
-    if not name or not storage.exists(name):
-        return placeholder, placeholder
-
-    thumb_path = thumb_name(name)
-    card_path = card_name(name)
-    if not storage.exists(thumb_path) or not storage.exists(card_path):
-        try:
-            write_variants(counsellor)
-        except OSError:
-            return placeholder, placeholder
-        name = counsellor.photo.name
-        thumb_path = thumb_name(name)
-        card_path = card_name(name)
-
-    detail = storage.url(card_path) if storage.exists(card_path) else counsellor.photo.url
-    thumb = storage.url(thumb_path) if storage.exists(thumb_path) else counsellor.photo.url
-    return detail, thumb
+    """Return (detail_url, thumb_url) from static files."""
+    rel = counsellor.photo_placeholder or "images/face_1.avif"
+    return _static_url(rel), _static_url(_thumb_static_path(rel))
 
 
 def _working_hours_dict(counsellor):
