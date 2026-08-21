@@ -10,7 +10,8 @@ Every function here queries fresh each call (never cache at module import
 time) so admin edits show up immediately, without a server restart.
 """
 
-from django.templatetags.static import static
+from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from .images import card_name, thumb_name, write_variants
 from .models import Counsellor, ServiceCategory, Topic
@@ -41,10 +42,33 @@ def _placeholder_path(path):
     return path
 
 
+def _placeholder_url(path):
+    """Resolve a placeholder through hashed static files without 500ing.
+
+    Prefer .avif; if that was never collected (stale STATIC_ROOT), use .png.
+    """
+    converted = _placeholder_path(path or "")
+    candidates = []
+    if converted:
+        candidates.append(converted)
+    if converted.endswith(".avif"):
+        candidates.append(f"{converted[:-5]}.png")
+    if path and path not in candidates:
+        candidates.append(path)
+
+    for candidate in candidates:
+        try:
+            return staticfiles_storage.url(candidate)
+        except ValueError:
+            continue
+    suffix = converted or path or "images/face_1.png"
+    return f"{settings.STATIC_URL.rstrip('/')}/{suffix.lstrip('/')}"
+
+
 def _resolve_photos(counsellor):
     """Return (detail_url, thumb_url). Detail is the 600px card when a
     real upload exists; both fall back to the static placeholder."""
-    placeholder = static(_placeholder_path(counsellor.photo_placeholder))
+    placeholder = _placeholder_url(counsellor.photo_placeholder)
     if not counsellor.photo:
         return placeholder, placeholder
 

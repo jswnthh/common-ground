@@ -2,11 +2,18 @@ from whitenoise.storage import CompressedManifestStaticFilesStorage
 
 
 class QuietWhiteNoiseStorage(CompressedManifestStaticFilesStorage):
-    """Hashed static files, but a missing manifest entry is not a 500.
+    """Hashed static files; a missing file must not 500 the page.
 
-    Django's default ManifestStaticFilesStorage raises ValueError in
-    production when {% static %} names a file that was not collected.
-    That is the usual cause of a site-wide 500 after DEBUG=False.
+    Django 6's ManifestStaticFilesStorage.stored_name always calls
+    hashed_name, which raises if the source is not in STATIC_ROOT.
+    WhiteNoise still re-raises that at URL lookup time even when
+    manifest_strict is False.
     """
 
     manifest_strict = False
+
+    def hashed_name(self, name, content=None, filename=None):
+        try:
+            return super().hashed_name(name, content, filename)
+        except ValueError:
+            return name
