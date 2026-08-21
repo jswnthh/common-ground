@@ -127,6 +127,28 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 3600
 
+# Tracebacks for 500s go to the process log (Render: service → Logs).
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -166,11 +188,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Hashed, immutable static files in production (collectstatic). Local runserver
-# keeps the plain storage backend so CSS/JS edits show up without a collect.
+# Hashed static files must use the same backend at collectstatic (build) and
+# at runtime. Key off Render, not DEBUG: toggling DEBUG=False after a DEBUG=True
+# build used to look for a missing hash manifest and 500 every page.
+_use_hashed_static = _on_render or not DEBUG
 _static_backend = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    if not DEBUG
+    "ProjectCounsellingSite.storage.QuietWhiteNoiseStorage"
+    if _use_hashed_static
     else "django.contrib.staticfiles.storage.StaticFilesStorage"
 )
 
