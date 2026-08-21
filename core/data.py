@@ -11,7 +11,7 @@ time) so admin edits show up immediately, without a server restart.
 """
 
 from django.conf import settings
-from django.contrib.staticfiles.storage import staticfiles_storage
+from django.templatetags.static import static
 
 from .images import card_name, thumb_name, write_variants
 from .models import Counsellor, ServiceCategory, Topic
@@ -43,24 +43,17 @@ def _placeholder_path(path):
 
 
 def _placeholder_url(path):
-    """Resolve a placeholder through hashed static files without 500ing.
-
-    Prefer .avif; if that was never collected (stale STATIC_ROOT), use .png.
-    """
+    """Prefer .avif; if hashed storage rejects it, fall back to .png."""
     converted = _placeholder_path(path or "")
-    candidates = []
-    if converted:
-        candidates.append(converted)
+    try:
+        return static(converted)
+    except ValueError:
+        pass
     if converted.endswith(".avif"):
-        candidates.append(f"{converted[:-5]}.png")
-    if path and path not in candidates:
-        candidates.append(path)
-
-    for candidate in candidates:
         try:
-            return staticfiles_storage.url(candidate)
+            return static(f"{converted[:-5]}.png")
         except ValueError:
-            continue
+            pass
     suffix = converted or path or "images/face_1.png"
     return f"{settings.STATIC_URL.rstrip('/')}/{suffix.lstrip('/')}"
 

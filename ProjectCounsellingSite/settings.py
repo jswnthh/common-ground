@@ -188,13 +188,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Hashed static files must use the same backend at collectstatic (build) and
-# at runtime. Key off Render, not DEBUG: toggling DEBUG=False after a DEBUG=True
-# build used to look for a missing hash manifest and 500 every page.
-_use_hashed_static = _on_render or not DEBUG
+# Compress CSS/JS for WhiteNoise, but do not content-hash filenames.
+# Manifest hashing produced URLs like index.dd4b7014a488.css while STATIC_ROOT
+# only had index.css, so every stylesheet/image 404'd in production.
 _static_backend = (
-    "ProjectCounsellingSite.storage.QuietWhiteNoiseStorage"
-    if _use_hashed_static
+    "whitenoise.storage.CompressedStaticFilesStorage"
+    if (_on_render or not DEBUG)
     else "django.contrib.staticfiles.storage.StaticFilesStorage"
 )
 
