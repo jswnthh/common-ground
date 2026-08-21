@@ -197,11 +197,16 @@ _static_backend = (
     else "django.contrib.staticfiles.storage.StaticFilesStorage"
 )
 
-# Counsellor headshot uploads (ImageField on core.Counsellor). Served by
-# Django itself in dev only — see ProjectCounsellingSite/urls.py. When
-# AWS_STORAGE_BUCKET_NAME is set, uploads go to S3/R2 instead (public-read,
-# long cache; django-storages).
-MEDIA_URL = os.environ.get("MEDIA_URL", "media/")
+# Counsellor headshot uploads (ImageField on core.Counsellor). Local disk is
+# served by Django in urls.py whenever FileSystemStorage is in use (including
+# production on Render). When AWS_STORAGE_BUCKET_NAME is set, uploads go to
+# S3/R2 instead (public-read, long cache; django-storages).
+MEDIA_URL = os.environ.get("MEDIA_URL", "/media/")
+if not MEDIA_URL.startswith(("http://", "https://")):
+    if not MEDIA_URL.startswith("/"):
+        MEDIA_URL = f"/{MEDIA_URL}"
+    if not MEDIA_URL.endswith("/"):
+        MEDIA_URL += "/"
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {

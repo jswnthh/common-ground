@@ -67,10 +67,16 @@ def _resolve_photos(counsellor):
 
     storage = counsellor.photo.storage
     name = counsellor.photo.name
+    if not name or not storage.exists(name):
+        return placeholder, placeholder
+
     thumb_path = thumb_name(name)
     card_path = card_name(name)
     if not storage.exists(thumb_path) or not storage.exists(card_path):
-        write_variants(counsellor)
+        try:
+            write_variants(counsellor)
+        except OSError:
+            return placeholder, placeholder
         name = counsellor.photo.name
         thumb_path = thumb_name(name)
         card_path = card_name(name)

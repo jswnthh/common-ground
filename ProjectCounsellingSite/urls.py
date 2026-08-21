@@ -35,5 +35,10 @@ urlpatterns = [
     path('robots.txt', robots_txt, name='robots_txt'),
 ]
 
-if settings.DEBUG and settings.STORAGES["default"]["BACKEND"].endswith("FileSystemStorage"):
+# Local uploads live under MEDIA_ROOT. Serve them whenever we are not on
+# object storage — including production. Render has no separate media host.
+_media_backend = settings.STORAGES["default"]["BACKEND"]
+if _media_backend.endswith("FileSystemStorage") and not settings.MEDIA_URL.startswith(
+    ("http://", "https://")
+):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
